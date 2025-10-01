@@ -82,7 +82,7 @@ The `docker-compose.yml` created in Part 1 already includes the pieces needed fo
   - The app reaches Redis by hostname **`redis`** on port `${REDIS_PORT:-6379}`.
 
 ### Verify persistence
-```bash
+
 # bump the counter
 curl http://localhost:${PORT:-8000}/
 
@@ -108,3 +108,14 @@ docker compose exec redis sh -c "redis-cli get hits"
 - Redis:
   docker compose exec redis sh -c "redis-cli ping; redis-cli get hits"
   (optional) docker compose exec redis sh -c "redis-cli monitor"
+
+## Part 4 — Clean-Up
+
+# stop containers + remove compose network
+docker compose down
+
+# remove volumes (data loss)
+docker compose down -v
+# or explicitly:
+docker volume rm <project>_redis-data
+
