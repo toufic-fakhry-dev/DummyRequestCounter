@@ -1,9 +1,13 @@
-#python
+# =========================
+# Python
+# =========================
 __pycache__/
 *.py[cod]
 *$py.class
 *.so
 .Python
+
+# Distribution / packaging
 build/
 develop-eggs/
 dist/
@@ -24,13 +28,33 @@ wheels/
 venv/
 env/
 ENV/
+.venv/
+.env
 
-# IDE
+# =========================
+# Flask / Environment
+# =========================
+# Local dotenv files
+.env.*
+!.env.example
+
+# =========================
+# IDE / Editor
+# =========================
 .vscode/
 .idea/
 *.swp
 *.swo
 
-# OS
+# =========================
+# OS files
+# =========================
 .DS_Store
 Thumbs.db
+
+# =========================
+# Docker
+# =========================
+docker-compose.override.yml
+docker-compose.local.yml
+*.log
