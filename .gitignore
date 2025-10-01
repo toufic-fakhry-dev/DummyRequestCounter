@@ -1,4 +1,4 @@
-#python
+# Python
 __pycache__/
 *.py[cod]
 *$py.class
@@ -34,3 +34,22 @@ ENV/
 # OS
 .DS_Store
 Thumbs.db
+
+# Docker
+.dockerignore
+Dockerfile*
+docker-compose*
+.docker/
+# Temporary container files
+temp/
+tmp/
+
+# Environment files
+.env
+.env.local
+.env.prod
+.env.dev
+
+# Logs
+*.log
+logs/
