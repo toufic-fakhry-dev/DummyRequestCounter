@@ -16,6 +16,12 @@ services:
   redis:
     image: redis:7-alpine
     container_name: dummy_redis
-    # (Part 1: no persistence yet; we'll add a volume in Part 2)
+    volumes:
+      - redis_data:/data  
     ports:
       - "${REDIS_PORT:-6379}:6379"    # optional external access
+
+
+  volumes:
+  redis_data:
+
