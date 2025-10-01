@@ -28,9 +28,40 @@ ENV/
 # IDE
 .vscode/
 .idea/
+*.db
 *.swp
 *.swo
 
 # OS
 .DS_Store
 Thumbs.db
+
+# Environment files
+.env
+
+# Docker Configuration Overrides
+docker-compose.override.yml
+
+# Logs and Data
+*.log
+*.sqlite
+data/
+db.sqlite3
+
+# Env + overrides
+.env
+docker-compose.override.yml
+
+# Logs
+*.log
+
+# Python test / cache
+.pytest_cache/
+.mypy_cache/
+
+# Local virtual envs
+.venv/
+venv/
+
+# Docker
+*.tar
