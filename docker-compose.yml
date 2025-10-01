@@ -1,0 +1,21 @@
+version: "3.9"
+
+services:
+  web:
+    build: .
+    container_name: dummy_web
+    ports:
+      - "5000:5000"              # host:container
+    environment:
+      FLASK_ENV: production
+      REDIS_HOST: redis          # service name = DNS hostname
+      REDIS_PORT: ${REDIS_PORT:-6379}  # can be overridden
+    depends_on:
+      - redis
+
+  redis:
+    image: redis:7-alpine
+    container_name: dummy_redis
+    # For Part 1 we don't persist yet (we'll add a volume in Part 2)
+    ports:
+      - "${REDIS_PORT:-6379}:6379"     # optional external access; can remove if you want internal only
