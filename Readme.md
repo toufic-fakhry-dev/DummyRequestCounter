@@ -68,3 +68,27 @@ docker compose down -v
 ### For Graders (Part 1)
 - **Implemented**: Dockerfile for FastAPI, pinned requirements, docker-compose orchestration, environment overrides (`PORT`, `REDIS_PORT`, `REDIS_DB`), and README.
 
+
+## Part 2 — Persistence & Networks
+
+The `docker-compose.yml` created in Part 1 already includes the pieces needed for persistence and networking. This section explains them and how to verify.
+
+### What’s configured
+- **Persistent Redis data**
+  - Named volume **`redis-data`** is mounted at `/data` in the Redis container.
+  - Redis snapshots (`--save 60 1`) keep the counter across restarts.
+- **Custom network**
+  - Both services join a dedicated bridge network **`appnet`**.
+  - The app reaches Redis by hostname **`redis`** on port `${REDIS_PORT:-6379}`.
+
+### Verify persistence
+```bash
+# bump the counter
+curl http://localhost:${PORT:-8000}/
+
+# restart containers WITHOUT deleting volumes
+docker compose down
+docker compose up -d
+
+# confirm the value is still there
+docker compose exec redis sh -c "redis-cli get hits"
