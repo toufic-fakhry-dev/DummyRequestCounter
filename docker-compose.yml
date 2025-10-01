@@ -5,17 +5,17 @@ services:
     build: .
     container_name: dummy_web
     ports:
-      - "5000:5000"              # host:container
+      - "8000:8000"                   # host:container (FastAPI on 8000)
     environment:
-      FLASK_ENV: production
-      REDIS_HOST: redis          # service name = DNS hostname
-      REDIS_PORT: ${REDIS_PORT:-6379}  # can be overridden
+      APP_ENV: production             # optional
+      REDIS_HOST: redis               # service name = DNS hostname
+      REDIS_PORT: ${REDIS_PORT:-6379} # overridable
     depends_on:
       - redis
 
   redis:
     image: redis:7-alpine
     container_name: dummy_redis
-    # For Part 1 we don't persist yet (we'll add a volume in Part 2)
+    # (Part 1: no persistence yet; we'll add a volume in Part 2)
     ports:
-      - "${REDIS_PORT:-6379}:6379"     # optional external access; can remove if you want internal only
+      - "${REDIS_PORT:-6379}:6379"    # optional external access

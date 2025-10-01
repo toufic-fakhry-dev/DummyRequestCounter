@@ -1,20 +1,18 @@
 # Use official Python image
 FROM python:3.9-slim
 
-# Set working directory inside container
+# Workdir inside container
 WORKDIR /app
 
-# Copy requirements first for caching
+# Install deps (layer-cached)
 COPY requirements.txt .
-
-# Install dependencies
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy application code
+# Copy project files
 COPY . .
 
-# Expose Flask port
-EXPOSE 5000
+# Expose FastAPI/Uvicorn port
+EXPOSE 8000
 
-# Run Flask app
-CMD ["python", "app/app.py"]
+# Start FastAPI with Uvicorn
+CMD ["uvicorn", "app.app:app", "--host", "0.0.0.0", "--port", "8000"]
