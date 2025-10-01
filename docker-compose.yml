@@ -1,4 +1,5 @@
 version: "3.8"
+
 services:
   web:
     build: .
@@ -13,9 +14,23 @@ services:
       - FLASK_RUN_HOST=0.0.0.0
     depends_on:
       - redis
+    networks:
+      - app_network
 
   redis:
     image: redis:7-alpine
     container_name: dummy_redis
     ports:
       - "${REDIS_PORT:-6379}:${REDIS_PORT:-6379}"
+    volumes:
+      - redis_data:/data
+    networks:
+      - app_network
+
+volumes:
+  redis_data:
+    driver: local
+
+networks:
+  app_network:
+    driver: bridge
