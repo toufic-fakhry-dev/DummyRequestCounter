@@ -1,0 +1,24 @@
+version: "3.9"
+
+services:
+  web:
+    build: .
+    ports:
+      - "${APP_PORT-8000}:8000"     # hostPort:containerPort, host default 8000
+    environment:
+      - REDIS_HOST=redis
+      - REDIS_PORT=${REDIS_PORT-6379}
+      - REDIS_DB=${REDIS_DB-0}
+    depends_on:
+      - redis
+    command: ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "${REDIS_PORT-6379}:6379"   # allows overriding host redis port
+    volumes:
+      - redis_data:/data
+
+volumes:
+  redis_data:
