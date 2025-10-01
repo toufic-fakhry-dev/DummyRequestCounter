@@ -34,3 +34,20 @@ ENV/
 # OS
 .DS_Store
 Thumbs.db
+
+# Docker / Compose
+*.log
+docker-compose.override.yml
+.env
+.env.*      # ignore local override env files
+redis-data/ # if you mount redis volume into repo folder
+
+# Test / coverage
+.coverage*
+htmlcov/
+.pytest_cache/
+
+# Cache / tooling
+.mypy_cache/
+.tox/
+.cache/
