@@ -1,27 +1,31 @@
-version: "3.9"
-
 services:
   web:
     build: .
     container_name: dummy_web
     ports:
-      - "8000:8000"                   # host:container (FastAPI on 8000)
+      - "8000:8000"
     environment:
-      APP_ENV: production             # optional
-      REDIS_HOST: redis               # service name = DNS hostname
-      REDIS_PORT: ${REDIS_PORT:-6379} # overridable
+      APP_ENV: production
+      REDIS_HOST: redis
+      REDIS_PORT: ${REDIS_PORT:-6379}
     depends_on:
       - redis
+    networks:
+      - app_net
 
   redis:
     image: redis:7-alpine
     container_name: dummy_redis
     volumes:
-      - redis_data:/data  
+      - redis_data:/data
     ports:
-      - "${REDIS_PORT:-6379}:6379"    # optional external access
+      - "${REDIS_PORT:-6379}:6379"
+    networks:
+      - app_net
 
-
-  volumes:
+volumes:
   redis_data:
 
+networks:
+  app_net:
+    driver: bridge
