@@ -92,3 +92,19 @@ docker compose up -d
 
 # confirm the value is still there
 docker compose exec redis sh -c "redis-cli get hits"
+
+## Part 3 — Troubleshooting & Debugging Docker Compose
+
+1) View container logs
+- All services (timestamps, follow):  docker compose logs --timestamps -f
+- Web only:                          docker compose logs -f web
+- Redis only:                        docker compose logs -f redis
+
+2) Run commands inside containers (exec)
+- Web:
+  docker compose exec web python -V
+  docker compose exec web sh -c "env | sort | grep -E '^REDIS|^PORT'"
+  docker compose exec web python -c "import os,socket; print(socket.gethostbyname(os.getenv('REDIS_HOST','redis')))"
+- Redis:
+  docker compose exec redis sh -c "redis-cli ping; redis-cli get hits"
+  (optional) docker compose exec redis sh -c "redis-cli monitor"
