@@ -22,3 +22,12 @@ To test the counter, use `curl`:
 ```bash
 curl http://localhost:8000
 # The hit count will increment with each request.
+
+
+## Part 2: Persistence and Custom Networking
+
+### Persistent Storage
+The `redis` service now uses a **named volume** called `redis_data` to ensure the hit count persists even after the container is stopped and removed. The volume is mounted to the default Redis data directory (`/data`) within the container.
+
+### Custom Network
+We replaced the default network with a custom bridge network called **`app-network`**. This improves network isolation and management, though the services still communicate seamlessly using their service names (`web` and `redis`).
