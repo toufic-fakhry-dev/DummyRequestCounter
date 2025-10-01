@@ -19,11 +19,14 @@ wheels/
 *.egg-info/
 .installed.cfg
 *.egg
+*.pyo
+*.pyd
 
 # Virtual environments
 venv/
 env/
 ENV/
+.env/
 
 # IDE
 .vscode/
@@ -34,3 +37,9 @@ ENV/
 # OS
 .DS_Store
 Thumbs.db
+
+*.log
+docker-compose.override.yml
+.env.local
+
+*.pid
