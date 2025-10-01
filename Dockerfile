@@ -22,5 +22,4 @@ USER appuser
 COPY . /app
 
 EXPOSE 8000
-# If your entry file isn't app/main.py, adjust "app.main:app" accordingly
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["sh", "-c", "uvicorn app.app:app --host 0.0.0.0 --port ${API_PORT:-8000}"]
