@@ -2,3 +2,5 @@ fastapi
 uvicorn[standard]
 redis
 pydantic
+Flask==2.3.2
+redis==4.6.0
