@@ -5,16 +5,16 @@ import uvicorn
 
 app = FastAPI()
 
-# TODO: Configuration from environment variables
-REDIS_HOST = "localhost"
-REDIS_PORT = 6379
+REDIS_HOST = os.getenv("REDIS_HOST", "redis")
+REDIS_PORT = int(os.getenv("REDIS_PORT", "6379"))
+REDIS_DB   = int(os.getenv("REDIS_DB", "0"))
 
-redis = Redis(host=REDIS_HOST, port=REDIS_PORT)
+redis = Redis(host=REDIS_HOST, port=REDIS_PORT, db=REDIS_DB, decode_responses=True)
 
 @app.get("/")
 def hello():
     redis.incr('hits')
-    hits = redis.get('hits').decode('utf-8')
+    hits = redis.get('hits')
     return f"Hello! This page has been visited {hits} times."
 
 if __name__ == "__main__":

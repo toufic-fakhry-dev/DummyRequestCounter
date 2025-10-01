@@ -1,4 +1,4 @@
-fastapi
-uvicorn[standard]
-redis
-pydantic
+fastapi==0.115.0
+uvicorn==0.30.0
+redis==5.0.8
+python-dotenv==1.0.1
