@@ -34,3 +34,55 @@ ENV/
 # OS
 .DS_Store
 Thumbs.db
+
+# --- OS / Editors ---
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+.idea/
+.vscode/
+
+# --- Python ---
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+env/
+.conda/
+.python-version
+.mypy_cache/
+.pytype/
+.ruff_cache/
+.tox/
+pytestdebug.log
+.pytest_cache/
+.coverage
+.coverage.*
+coverage.xml
+htmlcov/
+.ipynb_checkpoints/
+
+# --- Packaging / Build ---
+build/
+dist/
+*.egg-info/
+.eggs/
+
+# --- Logs / Caches ---
+*.log
+logs/
+.cache/
+
+# --- Environment / Secrets ---
+.env
+.env.*
+*.secret
+*.secrets
+
+# --- Docker ---
+docker-compose.override.yml
+
+# --- App specific ---
+data/
