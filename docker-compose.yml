@@ -1,0 +1,30 @@
+version: "3.9"
+
+services:
+  web:
+    build: .
+    ports:
+      - "8000:8000"
+    environment:
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+    depends_on:
+      - redis
+    networks:
+      - app-net   # just reference the network here
+
+  redis:
+    image: redis:7
+    volumes:
+      - redis-data:/data
+    ports:
+      - "6379:6379"
+    networks:
+      - app-net   # just reference the network here
+
+volumes:
+  redis-data:
+
+networks:
+  app-net:
+    driver: bridge   # define the driver here
