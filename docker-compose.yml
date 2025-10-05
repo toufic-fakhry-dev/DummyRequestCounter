@@ -1,24 +1,31 @@
-version: "3.9"
-
 services:
   web:
     build: .
+    container_name: fastapi_web
     ports:
-      - "${APP_PORT-8000}:8000"     # hostPort:containerPort, host default 8000
+      - "8000:8000"
     environment:
-      - REDIS_HOST=redis
-      - REDIS_PORT=${REDIS_PORT-6379}
-      - REDIS_DB=${REDIS_DB-0}
+      - REDIS_HOST=${REDIS_HOST:-redis}
+      - REDIS_PORT=${REDIS_PORT:-6379}
     depends_on:
       - redis
-    command: ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
+    command: ["uvicorn", "app.app:app", "--host", "0.0.0.0", "--port", "8000"]
+    networks:
+      - backend
 
   redis:
-    image: redis:7-alpine
+    image: redis:latest
+    container_name: fastapi_redis
     ports:
-      - "${REDIS_PORT-6379}:6379"   # allows overriding host redis port
+      - "${REDIS_EXTERNAL_PORT:-6379}:6379"
     volumes:
       - redis_data:/data
+    networks:
+      - backend
 
 volumes:
   redis_data:
+
+networks:
+  backend:
+    driver: bridge

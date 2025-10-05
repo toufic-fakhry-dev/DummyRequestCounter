@@ -23,6 +23,7 @@ wheels/
 *.egg-info/
 .installed.cfg
 *.egg
+MANIFEST
 
 # Virtual environments
 venv/
@@ -31,10 +32,27 @@ ENV/
 .venv/
 .env
 
+# PyInstaller
+*.manifest
+*.spec
+
+# Unit test / coverage reports
+htmlcov/
+.tox/
+.nox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+.pytest_cache/
+
 # =========================
-# Flask / Environment
+# FastAPI / Environment
 # =========================
 # Local dotenv files
+.env
 .env.*
 !.env.example
 
@@ -45,12 +63,19 @@ ENV/
 .idea/
 *.swp
 *.swo
+*~
 
 # =========================
 # OS files
 # =========================
 .DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
 Thumbs.db
+Desktop.ini
 
 # =========================
 # Docker
@@ -58,3 +83,9 @@ Thumbs.db
 docker-compose.override.yml
 docker-compose.local.yml
 *.log
+
+# =========================
+# Project specific
+# =========================
+# Redis data (if running locally)
+dump.rdb
