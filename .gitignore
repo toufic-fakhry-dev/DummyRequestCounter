@@ -1,4 +1,4 @@
-#python
+# python
 __pycache__/
 *.py[cod]
 *$py.class
@@ -34,3 +34,17 @@ ENV/
 # OS
 .DS_Store
 Thumbs.db
+
+# Docker
+docker-compose.override.yml
+
+# Env files
+.env
+
+# Logs
+*.log
+
+# Testing / coverage
+.pytest_cache/
+.coverage
+htmlcov/

@@ -1,0 +1,30 @@
+services:
+  web:
+    build: .
+    # Publish port 8000 from each container to a unique host port automatically
+    ports:
+      - "8000" # Docker will map dynamically for scaled instances
+    environment:
+      - REDIS_HOST=redis
+      - REDIS_PORT=${REDIS_PORT:-6379}
+    depends_on:
+      - redis
+    networks:
+      - appnet
+
+  redis:
+    image: redis:7-alpine
+    # No container_name here to keep naming dynamic
+    ports:
+      - "${REDIS_PORT:-6379}:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - appnet
+
+volumes:
+  redis_data:
+
+networks:
+  appnet:
+    driver: bridge
