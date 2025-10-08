@@ -17,13 +17,12 @@ def test_root():
     assert response.json() == {"message": "Welcome to DummyRequestCounter!"}
 
 
-def test_request_count():
-    # First request
+def test_request_count():   
     response1 = client.get("/count")
     assert response1.status_code == 200
     data1 = response1.json()
 
-    # Second request
+    
     response2 = client.get("/count")
     data2 = response2.json()
 
