@@ -136,7 +136,7 @@ jobs:
           context: .
           push: true
           tags: |
-            Lea721/dummy-request-counter:latest
-            Lea721/my-request-counter:${{ github.sha }}
+            lea721/dummy-request-counter:latest
+            lea721/dummy-request-counter:${{ github.sha }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
