@@ -96,3 +96,24 @@ git add .
 git commit -m "Complete TP2 Lab: FastAPI + Redis setup"
 git push origin dev
 ```
+
+## CI/CD Pipeline Overview
+
+This project includes a complete CI/CD pipeline using **GitHub Actions**.
+
+### CI (Continuous Integration)
+
+- Code quality checks using **flake8**
+- Security scan using **bandit**
+- Unit and integration tests using **pytest**
+- Docker image build and health check
+
+### CD (Continuous Deployment)
+
+- Logs in to Docker Hub using GitHub Secrets
+- Builds and pushes the image automatically to Docker Hub
+- Verifiable at: [https://hub.docker.com/r/elierhayem/dummyrequestcounter](https://hub.docker.com/r/elierhayem/dummyrequestcounter)
+
+### Pipeline Trigger
+
+The workflow runs automatically on every push or pull request to the `main` branch.
