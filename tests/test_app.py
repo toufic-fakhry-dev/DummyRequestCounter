@@ -5,8 +5,8 @@ import os
 # Ensure the app module can be imported
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
-from fastapi.testclient import TestClient
-from app.app import app
+from fastapi.testclient import TestClient  #nosec E402
+from app.app import app  #nosec E402
 
 client = TestClient(app)
 
