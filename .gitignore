@@ -1,36 +1,85 @@
-#python
+# ============================================
+# PYTHON
+# ============================================
 __pycache__/
 *.py[cod]
 *$py.class
 *.so
 .Python
+*.egg
+*.egg-info/
+.eggs/
+*.manifest
+*.spec
+
+# Build / packaging
 build/
 develop-eggs/
 dist/
 downloads/
-eggs/
-.eggs/
-lib/
-lib64/
-parts/
 sdist/
-var/
 wheels/
-*.egg-info/
-.installed.cfg
-*.egg
+pip-wheel-metadata/
+share/python-wheels/
+MANIFEST
 
-# Virtual environments
+# Installer logs
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Unit test / coverage reports
+htmlcov/
+.tox/
+.nox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.py,cover
+.hypothesis/
+.pytest_cache/
+
+# ============================================
+# VIRTUAL ENVIRONMENTS
+# ============================================
 venv/
 env/
 ENV/
+.venv/
+venv.bak/
 
-# IDE
+# ============================================
+# ENVIRONMENT VARIABLES & CONFIG FILES
+# ============================================
+.env
+.env.*
+*.env
+*.ini
+*.cfg
+*.conf
+secrets.json
+
+# ============================================
+# IDE / EDITOR SETTINGS
+# ============================================
 .vscode/
 .idea/
 *.swp
 *.swo
 
-# OS
+# ============================================
+# OPERATING SYSTEM FILES
+# ============================================
 .DS_Store
 Thumbs.db
+Desktop.ini
+
+# ============================================
+# DOCKER & COMPOSE
+# ============================================
+# Ignore local image layers / logs if added later
+*.log
+docker-compose.override.yml
+**/tmp/
