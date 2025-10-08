@@ -8,7 +8,9 @@ REDIS_HOST = "redis"
 REDIS_PORT = 6379
 
 try:
-    redis = Redis(host=REDIS_HOST, port=REDIS_PORT, socket_connect_timeout=2, socket_timeout=2)
+    redis = Redis(
+        host=REDIS_HOST, port=REDIS_PORT, socket_connect_timeout=2, socket_timeout=2
+    )
     # Test connection
     redis.ping()
 except Exception:
