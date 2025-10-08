@@ -5,17 +5,18 @@ import uvicorn
 
 app = FastAPI()
 
-# TODO: Configuration from environment variables
-REDIS_HOST = "localhost"
-REDIS_PORT = 6379
+# Default to the Docker service name "redis"
+REDIS_HOST = os.getenv("REDIS_HOST", "redis")
+REDIS_PORT = int(os.getenv("REDIS_PORT", 6379))
 
-redis = Redis(host=REDIS_HOST, port=REDIS_PORT)
+# Return str automatically (no manual .decode)
+redis = Redis(host=REDIS_HOST, port=REDIS_PORT, decode_responses=True)
 
 @app.get("/")
 def hello():
-    redis.incr('hits')
-    hits = redis.get('hits').decode('utf-8')
+    hits = redis.incr("hits")  # incr returns the new integer value
     return f"Hello! This page has been visited {hits} times."
 
 if __name__ == "__main__":
+    # This path runs only if you launch "python app.py" locally.
     uvicorn.run(app, host="0.0.0.0", port=8000)
