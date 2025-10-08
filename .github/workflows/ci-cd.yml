@@ -136,7 +136,7 @@ jobs:
           context: .
           push: true
           tags: |
-            ${{ secrets.DOCKER_USERNAME }}/dummy-request-counter:latest
-            ${{ secrets.DOCKER_USERNAME }}/dummy-request-counter:${{ github.sha }}
+            fatima275/dummy-request-counter:latest
+            fatima275/dummy-request-counter:${{ github.sha }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
