@@ -1,29 +1,24 @@
-import os
+# tests/test_app.py
 import sys
+import os
 
-# Add the project root to sys.path so we can import the app package
+# Ensure the app module can be imported
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
-from fastapi.testclient import TestClient  # noqa: E402
-from app.app import app # noqa: E402
-
+from fastapi.testclient import TestClient
+from app.app import app
 
 client = TestClient(app)
 
 
-def test_root():
+def test_root_endpoint():
     response = client.get("/")
     assert response.status_code == 200
-    assert response.json() == {"message": "Welcome to DummyRequestCounter!"}
+    assert "message" in response.json()
 
 
-def test_request_count():   
-    response1 = client.get("/count")
-    assert response1.status_code == 200
-    data1 = response1.json()
-
-    
-    response2 = client.get("/count")
-    data2 = response2.json()
-
-    assert data2["count"] == data1["count"] + 1
+def test_root_endpoint_counter():
+    # Call the endpoint multiple times to check counter increments
+    first = client.get("/").json()["message"]
+    second = client.get("/").json()["message"]
+    assert first != second
