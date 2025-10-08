@@ -1,0 +1,43 @@
+version: "3.9"
+
+services:
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    command: ["redis-server", "--appendonly", "yes"]   # enable persistence
+    ports:
+      - "${REDIS_PORT:-6379}:6379"
+    volumes:
+      - redis-data:/data                                # persist data
+    networks:
+      - my-network                                      # connect redis to custom network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  web:
+    build: .
+    restart: unless-stopped
+    volumes:
+      - ./:/code
+    ports:
+      - "${APP_PORT:-8000}:8000"
+    environment:
+      - REDIS_HOST=redis
+      - REDIS_PORT=${REDIS_PORT:-6379}
+      - APP_PORT=${APP_PORT:-8000}
+    command: ["sh", "-c", "uvicorn app.app:app --host 0.0.0.0 --port ${APP_PORT:-8000}"]
+    depends_on:
+      redis:
+        condition: service_healthy
+    networks:
+      - my-network                                      # connect web to same network
+
+volumes:
+  redis-data:                                            # named volume for Redis persistence
+
+networks:
+  my-network:                                            # custom bridge network
+    driver: bridge

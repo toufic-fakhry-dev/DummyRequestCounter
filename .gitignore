@@ -34,3 +34,14 @@ ENV/
 # OS
 .DS_Store
 Thumbs.db
+
+# Environment & secrets
+.env
+*.env
+
+# Logs
+*.log
+
+# Docker / Compose
+docker-compose.override.yml
+.docker/
