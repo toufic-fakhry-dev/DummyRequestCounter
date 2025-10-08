@@ -24,6 +24,7 @@ wheels/
 venv/
 env/
 ENV/
+.venv/
 
 # IDE
 .vscode/
@@ -34,3 +35,15 @@ ENV/
 # OS
 .DS_Store
 Thumbs.db
+
+# Docker
+.dockerignore
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# Logs
+*.log
+logs/
