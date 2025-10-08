@@ -4,8 +4,8 @@ import sys
 # Add the project root to sys.path so we can import the app package
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
-from fastapi.testclient import TestClient
-from app.app import app
+from fastapi.testclient import TestClient  # noqa: E402
+from app.app import app # noqa: E402
 
 
 client = TestClient(app)
