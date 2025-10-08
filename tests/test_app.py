@@ -1,6 +1,9 @@
 # tests/test_app.py
 from fastapi.testclient import TestClient
-from app.app import app  # make sure this matches your FastAPI app location
+import sys, os
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
+from app.app import app
 
 client = TestClient(app)
 
