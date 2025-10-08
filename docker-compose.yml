@@ -1,0 +1,25 @@
+services:
+  web:
+    build: .
+    ports:
+      - "5000:8000"
+    depends_on:
+      - redis
+    networks:
+      - app-network
+
+  redis:
+    image: "redis:alpine"
+    command: redis-server --appendonly yes
+    volumes:
+      - redis-data:/data
+    networks:
+      - app-network
+
+volumes:
+  redis-data:
+    driver: local
+
+networks:
+  app-network:
+    driver: bridge
