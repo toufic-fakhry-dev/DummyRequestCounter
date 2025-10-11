@@ -29,14 +29,14 @@ def test_root_increments_and_returns(patch_redis):
     client = flask_app.test_client()
 
     resp1 = client.get("/")
-    assert resp1.status_code == 200
+    assert resp1.status_code == 200  # nosec B101
     assert (
         "Hello! This page has been visited 1 times."
         in resp1.get_data(as_text=True)
-    )
+    )  # nosec B101
 
     resp2 = client.get("/")
     assert (
         "Hello! This page has been visited 2 times."
         in resp2.get_data(as_text=True)
-    )
+    )  # nosec B101
