@@ -30,7 +30,13 @@ def test_root_increments_and_returns(patch_redis):
 
     resp1 = client.get("/")
     assert resp1.status_code == 200
-    assert "Hello! This page has been visited 1 times." in resp1.get_data(as_text=True)
+    assert (
+        "Hello! This page has been visited 1 times."
+        in resp1.get_data(as_text=True)
+    )
 
     resp2 = client.get("/")
-    assert "Hello! This page has been visited 2 times." in resp2.get_data(as_text=True)
+    assert (
+        "Hello! This page has been visited 2 times."
+        in resp2.get_data(as_text=True)
+    )
