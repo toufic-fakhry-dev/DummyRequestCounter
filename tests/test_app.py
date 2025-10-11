@@ -19,8 +19,8 @@ class FakeRedis:
 @pytest.fixture(autouse=True)
 def patch_redis(monkeypatch):
     fake = FakeRedis()
-    # patch the redis instance inside app.app module
-    monkeypatch.setattr(app_module, "redis", fake)
+    # patch the redis_client instance inside app.app module
+    monkeypatch.setattr(app_module, "redis_client", fake)
     return fake
 
 
