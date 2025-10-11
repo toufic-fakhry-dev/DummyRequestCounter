@@ -20,6 +20,6 @@ def hello():
 
 if __name__ == "__main__":
     app.run(
-        host="0.0.0.0",
+        host="0.0.0.0", # nosec B104
         port=int(os.getenv("FLASK_PORT", 5000))
-    )  # nosec B104
+    )
