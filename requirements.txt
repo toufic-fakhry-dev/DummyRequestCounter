@@ -4,3 +4,7 @@ pydantic
 Flask
 redis
 gunicorn
+pytest
+pytest-mock
+flake8
+bandit

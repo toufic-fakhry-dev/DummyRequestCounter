@@ -10,19 +10,9 @@ redis_client = redis.Redis(host=REDIS_HOST, port=REDIS_PORT, decode_responses=Tr
 
 @app.get("/")
 def hello():
-    redis.incr('hits')
-    hits = redis.get('hits').decode('utf-8')
+    redis_client.incr('hits')
+    hits = redis_client.get('hits')
     return f"Hello! This page has been visited {hits} times."
-
-# Added another endpoint to test POST requests with custom keys
-@app.route("/count", methods=["POST"])
-def count():
-    key = request.json.get("key")
-    if not key:
-        return jsonify({"error": "Missing key"}), 400
-
-    new_count = redis_client.incr(key)
-    return jsonify({"key": key, "count": new_count})
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=int(os.getenv("FLASK_PORT", 5000)))
