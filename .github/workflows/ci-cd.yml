@@ -84,11 +84,10 @@ jobs:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
       - name: Build and push image
-        working-directory: ${{ env.APP_DIR }}
         uses: docker/build-push-action@v5
         with:
-          context: .
-          file: Dockerfile
+          context: ./${{ env.APP_DIR }}
+          file: ./${{ env.APP_DIR }}/Dockerfile
           push: true
           tags: |
             ${{ secrets.DOCKER_USERNAME }}/dummyrequestcounter:latest
