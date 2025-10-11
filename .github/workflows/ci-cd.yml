@@ -8,7 +8,7 @@ on:
   workflow_dispatch:
 
 env:
-  APP_DIR: DummyRequestCounter
+  APP_DIR: .
 
 jobs:
   lint:
@@ -17,7 +17,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Debug - List files
-        run: ls -la DummyRequestCounter/
+        run: ls -la .
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
@@ -25,10 +25,10 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install -r ${{ env.APP_DIR }}/requirements.txt
+          pip install -r requirements.txt
           pip install flake8
       - name: Run flake8
-        run: flake8 ${{ env.APP_DIR }}
+        run: flake8 .
 
   security-scan:
     name: Security (bandit)
@@ -43,10 +43,10 @@ jobs:
       - name: Install bandit
         run: |
           python -m pip install --upgrade pip
-          pip install -r ${{ env.APP_DIR }}/requirements.txt
+          pip install -r requirements.txt
           pip install bandit
       - name: Run bandit
-        run: bandit -r ${{ env.APP_DIR }} -x "${{ env.APP_DIR }}/.venv"
+        run: bandit -r . -x "./.venv"
 
   tests:
     name: Tests (pytest)
@@ -64,10 +64,9 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install -r ${{ env.APP_DIR }}/requirements.txt
+          pip install -r requirements.txt
           pip install pytest pytest-mock
       - name: Run tests
-        working-directory: ${{ env.APP_DIR }}
         run: python -m pytest tests/ -v
 
   build-and-push:
@@ -88,8 +87,8 @@ jobs:
       - name: Build and push image
         uses: docker/build-push-action@v5
         with:
-          context: ./${{ env.APP_DIR }}
-          file: ./${{ env.APP_DIR }}/Dockerfile
+          context: .
+          file: ./Dockerfile
           push: true
           tags: |
             ${{ secrets.DOCKER_USERNAME }}/dummyrequestcounter:latest
