@@ -1,4 +1,10 @@
 fastapi
 uvicorn[standard]
-redis
 pydantic
+Flask
+redis
+gunicorn
+pytest
+pytest-mock
+flake8
+bandit

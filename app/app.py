@@ -1,21 +1,25 @@
-from fastapi import FastAPI
-from redis import Redis
 import os
-import uvicorn
+from flask import Flask
+import redis
 
-app = FastAPI()
+app = Flask(__name__)
 
-# TODO: Configuration from environment variables
-REDIS_HOST = "localhost"
-REDIS_PORT = 6379
+REDIS_HOST = os.getenv("REDIS_HOST", "localhost")
+REDIS_PORT = int(os.getenv("REDIS_PORT", 6379))
+redis_client = redis.Redis(
+    host=REDIS_HOST, port=REDIS_PORT, decode_responses=True
+)
 
-redis = Redis(host=REDIS_HOST, port=REDIS_PORT)
 
 @app.get("/")
 def hello():
-    redis.incr('hits')
-    hits = redis.get('hits').decode('utf-8')
+    redis_client.incr('hits')
+    hits = redis_client.get('hits')
     return f"Hello! This page has been visited {hits} times."
 
+
 if __name__ == "__main__":
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    app.run(
+        host="0.0.0.0",  # nosec B104
+        port=int(os.getenv("FLASK_PORT", 5000))
+    )
