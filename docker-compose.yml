@@ -1,0 +1,27 @@
+services:
+    web:
+        build: .
+        ports:
+            - "8000:8000"
+        environment:
+            - REDIS_PORT=${REDIS_PORT:-6379}
+        depends_on:
+            - redis
+        networks:
+            - mynet
+
+    redis:
+        image: "redis:7"
+        ports:
+            - "${REDIS_PORT:-6379}:${REDIS_PORT:-6379}"
+        volumes:
+            - redis_data:/data
+        networks:
+            - mynet
+
+volumes:
+    redis_data:
+
+
+networks:
+    mynet:
