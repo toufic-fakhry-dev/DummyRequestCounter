@@ -1,6 +1,8 @@
 #python
 __pycache__/
 *.py[cod]
+*.pyc
+.pytest_cache/
 *$py.class
 *.so
 .Python
@@ -24,7 +26,7 @@ wheels/
 venv/
 env/
 ENV/
-
+.env
 # IDE
 .vscode/
 .idea/
