@@ -1,25 +1,34 @@
-from fastapi import FastAPI
-from redis import Redis
+from flask import Flask, jsonify
+import redis
 import os
-import uvicorn
 
-app = FastAPI()
+app = Flask(__name__)
 
+<<<<<<< HEAD
 # Configuration from environment variables
 REDIS_HOST = os.getenv("REDIS_HOST", "localhost")
 REDIS_PORT = int(os.getenv("REDIS_PORT", 6379))
+=======
+# Use env vars with defaults
+redis_host = os.getenv("REDIS_HOST", "localhost")
+redis_port = int(os.getenv("REDIS_PORT", 6379))
+>>>>>>> 526b8f3 (Save all local changes before pull)
 
-redis = Redis(host=REDIS_HOST, port=REDIS_PORT)
+r = redis.Redis(host=redis_host, port=redis_port, decode_responses=True)
 
-@app.get("/")
-def hello():
-    redis.incr('hits')
-    hits = redis.get('hits').decode('utf-8')
-    return f"Hello! This page has been visited {hits} times."
+@app.route('/')
+def index():
+    count = r.incr('hits')
+    return jsonify({"message": f"Hello! This page has been visited {count} times."})
 
+<<<<<<< HEAD
 @app.get("/health")
 def health():
     return {"status": "ok"}
 
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=8000)
+=======
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=5000)
+>>>>>>> 526b8f3 (Save all local changes before pull)

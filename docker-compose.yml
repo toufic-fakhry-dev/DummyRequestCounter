@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 version: "3.9"
 
 services:
@@ -28,3 +29,39 @@ volumes:
 networks:
   app-net:
     driver: bridge   # define the driver here
+=======
+version: '3.9'
+
+services:
+  redis:
+    image: redis:7
+    container_name: redis-server
+    ports:
+      - "${REDIS_PORT:-6379}:6379"
+    volumes:
+      - redis-data:/data
+    networks:
+      - app-network   # <-- explicitly use custom network
+
+  web:
+    build: .
+    container_name: flask-app
+    ports:
+      - "5000:5000"
+    environment:
+      - REDIS_HOST=redis
+      - REDIS_PORT=${REDIS_PORT:-6379}
+    depends_on:
+      - redis
+    networks:
+      - app-network   # <-- explicitly use custom network
+
+# Volumes
+volumes:
+  redis-data:
+
+# Networks
+networks:
+  app-network:
+    driver: bridge
+>>>>>>> 526b8f3 (Save all local changes before pull)

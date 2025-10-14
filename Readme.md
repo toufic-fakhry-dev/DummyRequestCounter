@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # DummyRequestCounter – FastAPI + Redis with Docker Compose
 
 ## Part 1: Setting Up a Simple Multi-Container Application
@@ -107,3 +108,26 @@ git push origin feature/your-feature-name
 
 ✅ With these steps, **Parts 1 through 5 are fully completed**.  
 You now have a working FastAPI + Redis app containerized with Docker Compose, persistent storage, networking, debugging tools, clean-up commands, and version control workflows.
+=======
+# Dummy Request Counter (Flask + Redis + Docker Compose)
+
+## 🚀 Overview
+A simple Flask app that counts how many times the root endpoint is visited using Redis as a backend.  
+Runs inside Docker using multi-container orchestration with `docker-compose`.
+
+---
+
+## 🧱 Technologies
+- Python (Flask)
+- Redis
+- Docker & Docker Compose
+
+---
+
+## 🛠️ Setup
+
+### 1️⃣ Clone the repo
+```bash
+git clone https://github.com/toufic-fakhry-dev/DummyRequestCounter.git
+cd DummyRequestCounter
+>>>>>>> 526b8f3 (Save all local changes before pull)
