@@ -1,0 +1,67 @@
+name: CI
+
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  lint_and_test:
+    name: Lint, Security & Unit Tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: "pip"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install pytest pytest-cov flake8 black bandit pip-audit
+
+      - name: Lint (flake8)
+        run: flake8 app
+
+      - name: Format check (black)
+        run: black --check app tests
+
+      - name: Security (bandit)
+        run: bandit -q -r app || true   # make blocking by removing "|| true"
+
+      - name: Vulnerability scan (pip-audit)
+        run: pip-audit || true          # make blocking by removing "|| true"
+
+      - name: Run unit tests
+        run: pytest -q --maxfail=1 --disable-warnings --cov=app --cov-report=term-missing
+
+  docker_build_test:
+    name: Build & Smoke Test Container
+    runs-on: ubuntu-latest
+    needs: lint_and_test
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build image
+        run: docker build -t dummyrequestcounter:test .
+
+      - name: Run container & smoke test
+        run: |
+          docker run -d -p 8000:8000 --name drc dummyrequestcounter:test
+          # Wait for app to boot, then curl it
+          for i in {1..20}; do curl -fsS http://127.0.0.1:8000 && break || sleep 1; done
+          docker logs drc
