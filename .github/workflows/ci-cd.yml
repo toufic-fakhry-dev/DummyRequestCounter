@@ -9,23 +9,13 @@ on:
       - main
 
 jobs:
-  lint-test-build:
+  # 1️⃣ Code Quality
+  lint:
+    name: Lint & Code Analysis
     runs-on: ubuntu-latest
-
-    services:
-      redis:
-        image: redis:7-alpine
-        ports:
-          - 6379:6379
-        options: >-
-          --health-cmd "redis-cli ping"
-          --health-interval 5s
-          --health-timeout 5s
-          --health-retries 5
-
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v3
 
       - name: Set up Python
         uses: actions/setup-python@v4
@@ -36,29 +26,73 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
-          pip install flake8 bandit pytest httpx
+          pip install flake8 bandit
 
-      - name: Lint & Code Analysis
+      - name: Run Linter
+        run: flake8 app/ tests/
+
+      - name: Run Security Scan
+        run: bandit -r app/
+
+  # 2️⃣ Tests
+  test:
+    name: Run Tests
+    runs-on: ubuntu-latest
+    needs: lint
+    services:
+      redis:
+        image: redis
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.10"
+
+      - name: Install dependencies
         run: |
-          flake8 app/ tests/
-          bandit -r app/
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install pytest redis
 
-      - name: Run Tests
+      - name: Set PYTHONPATH
+        run: echo "PYTHONPATH=$(pwd)" >> $GITHUB_ENV
+
+      - name: Run Pytest
         env:
           REDIS_HOST: localhost
           REDIS_PORT: 6379
         run: pytest tests/ -v
 
-      - name: Build Docker image
-        run: docker build -t dummyrequestcounter .
+  # 3️⃣ Build & Push Docker Image
+  docker:
+    name: Build and Push Docker Image
+    runs-on: ubuntu-latest
+    needs: test
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
 
-      - name: Login to Docker Hub
-        uses: docker/login-action@v3
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v2
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
-      - name: Push Docker image
+      - name: Build Docker Image
         run: |
-          docker tag dummyrequestcounter ${{ secrets.DOCKER_USERNAME }}/dummyrequestcounter:latest
+          docker build -t ${{ secrets.DOCKER_USERNAME }}/dummyrequestcounter:latest .
+
+      - name: Push Docker Image
+        run: |
           docker push ${{ secrets.DOCKER_USERNAME }}/dummyrequestcounter:latest
