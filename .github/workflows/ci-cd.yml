@@ -82,7 +82,7 @@ jobs:
           pip install pytest
 
       - name: Run pytest (unit)
-        run: pytest -v
+        run: pytest -v tests/
 
   e2e-test:
     name: Integration / E2E (FastAPI + Redis service)
