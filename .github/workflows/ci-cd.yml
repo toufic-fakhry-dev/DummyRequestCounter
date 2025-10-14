@@ -7,14 +7,18 @@ on:
     branches: [ main, master ]
 
 jobs:
-  build:
+  test:
     runs-on: ubuntu-latest
     steps:
-      - name: checkout code
-        uses: actions/checkout@v4
-      - name: setup Python
+      - uses: actions/checkout@v3
+      - name: set up Python
         uses: actions/setup-python@v4
         with:
           python-version: '3.9'
-      - name: Display Python version
-        run: python --version
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
+      - name: Run simple test
+        run: |
+          echo "workflow is working!"
+          python --version
