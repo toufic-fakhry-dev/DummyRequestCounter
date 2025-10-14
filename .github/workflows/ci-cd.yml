@@ -82,6 +82,8 @@ jobs:
           pip install pytest
 
       - name: Run pytest (unit)
+        env:
+          PYTHONPATH: ${{ github.workspace }}
         run: pytest -v tests/
 
   e2e-test:
@@ -116,6 +118,7 @@ jobs:
 
       - name: Boot FastAPI (background) against Redis service
         env:
+          PYTHONPATH: ${{ github.workspace }}
           REDIS_HOST: 127.0.0.1
           REDIS_PORT: 6379
           REDIS_DB: 0
