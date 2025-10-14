@@ -2,10 +2,6 @@ fastapi
 uvicorn[standard]
 redis
 pydantic
-<<<<<<< HEAD
-flask
-=======
 Flask
-
-
->>>>>>> 526b8f3 (Save all local changes before pull)
+pytest
+httpx
