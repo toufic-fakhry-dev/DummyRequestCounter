@@ -3,8 +3,10 @@ name: CI
 on:
   push:
     branches: ["main"]
+    tags: ["v*"]         # push image when you tag (e.g., v1.0.0)
   pull_request:
     branches: ["main"]
+  workflow_dispatch:      # allow manual runs from Actions tab
 
 permissions:
   contents: read
@@ -16,16 +18,13 @@ jobs:
   code-quality:
     name: Code Quality & Security
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: ${{ env.PYTHON_VERSION }}
-
       - name: Cache pip
         uses: actions/cache@v4
         with:
@@ -33,23 +32,18 @@ jobs:
           key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
           restore-keys: |
             ${{ runner.os }}-pip-
-
       - name: Install tooling & deps
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
           pip install ruff mypy bandit pip-audit
-
       - name: Ruff (lint)
         run: ruff check .
-
       - name: Mypy (static types)
         run: |
           mypy --install-types --non-interactive --ignore-missing-imports app || true
-
       - name: Bandit (security scan of Python code)
         run: bandit -q -r app || true
-
       - name: pip-audit (3rd-party dependency vulnerabilities)
         run: pip-audit || true
 
@@ -57,16 +51,13 @@ jobs:
     name: Unit Tests (pytest)
     runs-on: ubuntu-latest
     needs: code-quality
-
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: ${{ env.PYTHON_VERSION }}
-
       - name: Cache pip
         uses: actions/cache@v4
         with:
@@ -74,13 +65,11 @@ jobs:
           key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
           restore-keys: |
             ${{ runner.os }}-pip-
-
       - name: Install deps (incl. pytest)
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
           pip install pytest
-
       - name: Run pytest (unit)
         env:
           PYTHONPATH: ${{ github.workspace }}
@@ -90,7 +79,6 @@ jobs:
     name: Integration / E2E (FastAPI + Redis service)
     runs-on: ubuntu-latest
     needs: unit-tests
-
     services:
       redis:
         image: redis:7-alpine
@@ -101,21 +89,17 @@ jobs:
           --health-interval=5s
           --health-timeout=3s
           --health-retries=20
-
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: ${{ env.PYTHON_VERSION }}
-
       - name: Install deps
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
-
       - name: Boot FastAPI (background) against Redis service
         env:
           PYTHONPATH: ${{ github.workspace }}
@@ -124,7 +108,6 @@ jobs:
           REDIS_DB: 0
         run: |
           nohup python -m uvicorn app.app:app --host 127.0.0.1 --port 8000 >/tmp/uvicorn.log 2>&1 & echo $! > /tmp/uvicorn.pid
-
       - name: Wait for /health
         run: |
           for i in {1..40}; do
@@ -137,12 +120,10 @@ jobs:
           echo "---- Uvicorn log ----"
           cat /tmp/uvicorn.log || true
           exit 1
-
       - name: Hit endpoints
         run: |
           curl -fsS http://127.0.0.1:8000/
           curl -fsS http://127.0.0.1:8000/docs >/dev/null
-
       - name: Teardown app
         if: always()
         run: |
@@ -152,22 +133,17 @@ jobs:
     name: Build, Run via Compose, Smoke Test & Scan
     runs-on: ubuntu-latest
     needs: e2e-test
-
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-
       - name: Compose config sanity
         run: docker compose config
-
       - name: Build images (Compose)
         run: docker compose build
-
       - name: Start stack
         env:
           APP_PORT: 8080
         run: docker compose up -d
-
       - name: Wait for health
         run: |
           for i in {1..50}; do
@@ -179,19 +155,15 @@ jobs:
           echo "Service not healthy"
           docker compose logs api || true
           exit 1
-
       - name: Smoke test container
         run: |
           curl -fsS http://localhost:8080/
           curl -fsS http://localhost:8080/docs >/dev/null
-
       - name: Stop stack
         if: always()
         run: docker compose down
-
       - name: Build final image tag (for scanning)
         run: docker build -t dummy-request-counter:ci .
-
       - name: Trivy (container vulnerability scan)
         uses: aquasecurity/trivy-action@0.28.0
         with:
@@ -200,3 +172,47 @@ jobs:
           ignore-unfixed: true
           vuln-type: "os,library"
           severity: "CRITICAL,HIGH"
+
+  docker-push:
+    name: CD — Build & Push Image to Docker Hub
+    runs-on: ubuntu-latest
+    needs: docker-build-and-scan
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # Compute tags (latest + short SHA)
+      - name: Compute tags
+        id: meta
+        run: |
+          SHORT_SHA=${GITHUB_SHA::7}
+          echo "latest=${{ secrets.DOCKER_USERNAME }}/dummy-request-counter:latest" >> $GITHUB_OUTPUT
+          echo "sha=${{ secrets.DOCKER_USERNAME }}/dummy-request-counter:${SHORT_SHA}" >> $GITHUB_OUTPUT
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Build & push (linux/amd64)
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: true
+          platforms: linux/amd64
+          tags: |
+            ${{ steps.meta.outputs.latest }}
+            ${{ steps.meta.outputs.sha }}
+
+      - name: Export image digest
+        run: |
+          echo "DIGEST=$(docker buildx imagetools inspect ${{ steps.meta.outputs.latest }} --format '{{json .Digest}}')" > image-digest.txt
+      - name: Upload artifact (image digest)
+        uses: actions/upload-artifact@v4
+        with:
+          name: docker-image-digest
+          path: image-digest.txt
