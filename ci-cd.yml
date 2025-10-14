@@ -1,0 +1,108 @@
+name: CI-CD (Docker Hub)
+
+on:
+  push:
+    branches: [ main, devops-tp2-solution ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+env:
+  PYTHON_VERSION: "3.11"
+  IMAGE_NAME: ${{ secrets.DOCKER_USERNAME }}/dummyrequestcounter
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    # Redis available for integration tests in this job
+    services:
+      redis:
+        image: redis:7
+        ports: ['6379:6379']
+        options: >-
+          --health-cmd "redis-cli ping || exit 1"
+          --health-interval 2s
+          --health-timeout 2s
+          --health-retries 30
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Install deps (app + dev)
+        run: |
+          python -m pip install --upgrade pip
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+          # Tools for quality + tests
+          pip install ruff pip-audit pytest
+
+      - name: Ruff lint
+        run: ruff check .
+
+      # Allow the workflow to continue even if vulnerabilities are found (tweak if your teacher requires fail)
+      - name: Security audit (pip-audit)
+        run: pip-audit
+        continue-on-error: true
+
+      - name: Run unit tests (no Redis)
+        run: pytest -m "not integration" -q
+
+      - name: Run integration tests (with Redis)
+        env:
+          REDIS_HOST: "127.0.0.1"
+          REDIS_PORT: "6379"
+        run: pytest -m "integration" -q
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Extract image metadata (tags, labels)
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.IMAGE_NAME }}
+          tags: |
+            type=ref,event=branch
+            type=ref,event=pr
+            type=sha
+            type=raw,value=latest,enable={{is_default_branch}}
+
+      # Build for verification on branches/PRs (no push)
+      - name: Build image (no push)
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: ./app/Dockerfile          # adjust if your Dockerfile path differs
+          push: false
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      # Only push when pushing to main (not on PRs / other branches)
+      - name: Log in to Docker Hub
+        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Build & push (main only)
+        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: ./app/Dockerfile
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
