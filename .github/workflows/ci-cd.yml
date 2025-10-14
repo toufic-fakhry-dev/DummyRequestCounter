@@ -72,18 +72,15 @@ jobs:
           DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
         run: echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
 
-      - name: Build image
+      - name: Build image & run container tests
         run: |
-          # Create a valid Docker image name: lowercase + replace / with -
           IMAGE_NAME="dummyrequestcounter:${{ github.sha }}"
-
           echo "Using image name: $IMAGE_NAME"
 
-          # Build the Docker image
+          # Build Docker image
           docker build -t "$IMAGE_NAME" .
 
-      - name: Run container tests
-        run: |
+          # Run container tests
           docker run --rm "$IMAGE_NAME" python -m pytest tests/ -v
 
 
