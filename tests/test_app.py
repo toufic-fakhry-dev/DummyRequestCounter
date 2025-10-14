@@ -6,6 +6,7 @@ import fakeredis
 import app.app as app_module
 from app.app import app  # FastAPI instance
 
+
 def _use_fake_redis():
     """
     Replace the module-level `redis` instance in app.app with a FakeRedis,
@@ -15,12 +16,14 @@ def _use_fake_redis():
     app_module.redis = fake
     return fake
 
+
 def test_root_200_and_contains_text():
     _use_fake_redis()
     client = TestClient(app)
     r = client.get("/")
     assert r.status_code == 200
     assert "visited" in r.text.lower()
+
 
 def test_counter_increments_hits_key():
     fake = _use_fake_redis()
