@@ -82,6 +82,7 @@ jobs:
 
           # Run container tests
           docker run --rm "$IMAGE_NAME" python -m pytest tests/ -v
+          
 
 
   deploy:
