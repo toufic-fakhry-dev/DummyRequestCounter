@@ -7,9 +7,56 @@ on:
     branches: [ main ]
 
 jobs:
-  build-and-push:
+  lint-and-scan:
+    name: Code Quality & Security Scan
     runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
 
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install linting and security tools
+        run: |
+          pip install flake8 bandit safety
+
+      - name: Run linting (flake8)
+        run: flake8 app --max-line-length=120
+
+      - name: Run security scan (bandit)
+        run: bandit -r app
+
+      - name: Check dependency vulnerabilities
+        run: safety check || true  
+
+  test:
+    name: Run Unit Tests
+    runs-on: ubuntu-latest
+    needs: [lint-and-scan]
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
+          pip install pytest httpx
+
+      - name: Run tests
+        run: pytest tests/ -v
+
+  build-and-push:
+    name: Build & Push Docker Image
+    runs-on: ubuntu-latest
+    needs: [test]
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
