@@ -1,4 +1,16 @@
 fastapi
 uvicorn[standard]
-redis
+redis==4.6.0
 pydantic
+
+pytest
+
+pytest-cov
+
+fakeredis
+
+httpx
+
+ruff
+black
+
