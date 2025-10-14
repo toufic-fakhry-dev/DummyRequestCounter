@@ -1,28 +1,22 @@
-from flask import Flask, jsonify
-import redis
+from fastapi import FastAPI
+from redis import Redis
 import os
+import uvicorn  # keep this here so uvicorn is defined
 
-app = Flask(__name__)
+app = FastAPI()
 
-# Configuration from environment variables
-REDIS_HOST = os.getenv("REDIS_HOST", "localhost")
-REDIS_PORT = int(os.getenv("REDIS_PORT", 6379))
-# Use env vars with defaults
-redis_host = os.getenv("REDIS_HOST", "localhost")
-redis_port = int(os.getenv("REDIS_PORT", 6379))
+# TODO: Configuration from environment variables
+REDIS_HOST = "localhost"
+REDIS_PORT = 6379
 
-r = redis.Redis(host=redis_host, port=redis_port, decode_responses=True)
+redis = Redis(host=REDIS_HOST, port=REDIS_PORT)
 
-@app.route('/')
-def index():
-    count = r.incr('hits')
-    return jsonify({"message": f"Hello! This page has been visited {count} times."})
-
-@app.get("/health")
-def health():
-    return {"status": "ok"}
+@app.get("/")
+def hello():
+    redis.incr("hits")
+    hits = redis.get("hits").decode("utf-8")
+    return f"Hello! This page has been visited {hits} times."
 
 if __name__ == "__main__":
+    # noqa: F821 - uvicorn is imported above, Flake8 may incorrectly report F821 otherwise
     uvicorn.run(app, host="0.0.0.0", port=8000)
-if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000)
