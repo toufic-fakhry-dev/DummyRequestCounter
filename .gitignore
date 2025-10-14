@@ -34,3 +34,42 @@ ENV/
 # OS
 .DS_Store
 Thumbs.db
+# ---- Workshop additions ----
+.venv/
+.python-version
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.cache/
+.coverage
+htmlcov/
+
+# Env and secrets
+.env
+.env.*
+*.pem
+*.key
+
+# Logs
+*.log
+logs/
+
+# Docker (local bind/volumes you might add)
+data/
+redis-data/
+# Windows misc
+desktop.ini
+
+# Jupyter (if ever used)
+.ipynb_checkpoints/
+
+# PEP 582 local packages (rare but harmless to ignore)
+__pypackages__/
+
+# Coverage extras
+.coverage.*
+coverage.xml
+
+# Stray PowerShell file that sometimes appears
+$null
+
