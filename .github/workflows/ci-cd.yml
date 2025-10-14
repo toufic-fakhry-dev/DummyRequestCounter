@@ -75,17 +75,12 @@ jobs:
       - name: Build image
         run: |
           # Create a valid Docker image name: lowercase + replace / with -
-          IMAGE_NAME="${{ github.repository }}:${{ github.sha }}"
-          IMAGE_NAME=$(echo "$IMAGE_NAME" | tr '[:upper:]' '[:lower:]' | tr '/' '-')
+          IMAGE_NAME="dummyrequestcounter:${{ github.sha }}"
+
           echo "Using image name: $IMAGE_NAME"
 
           # Build the Docker image
           docker build -t "$IMAGE_NAME" .
-
-          # Run container tests
-          docker run --rm "$IMAGE_NAME" python -m pytest tests/ -v
-
-
 
       - name: Run container tests
         run: |
