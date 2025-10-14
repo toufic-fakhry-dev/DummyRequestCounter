@@ -1,6 +1,5 @@
 import sys
 import os
-import pytest
 from fastapi.testclient import TestClient
 
 # Ensure app is importable
