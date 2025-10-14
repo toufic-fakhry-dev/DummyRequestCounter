@@ -6,9 +6,10 @@ from redis.asyncio import Redis
 
 REDIS_HOST = os.getenv("REDIS_HOST", "redis")
 REDIS_PORT = int(os.getenv("REDIS_PORT", "6379"))
-REDIS_DB   = int(os.getenv("REDIS_DB", "0"))
+REDIS_DB = int(os.getenv("REDIS_DB", "0"))
 
 redis_client: Redis | None = None
+
 
 @asynccontextmanager
 async def lifespan(_: FastAPI):
@@ -23,27 +24,37 @@ async def lifespan(_: FastAPI):
         yield
     finally:
         if redis_client:
-            await redis_client.close()
+            await redis_client.aclose()
+
 
 app = FastAPI(title="FastAPI + Redis", lifespan=lifespan)
 
+
 @app.get("/")
 async def index():
-    global redis_client
     if not redis_client:
-        return JSONResponse({"message": "Redis client not ready"}, status_code=503)
+        return JSONResponse(
+            {"message": "Redis client not ready"},
+            status_code=503
+        )
     try:
         hits = await redis_client.incr("hits")
         return {"message": "Hello from FastAPI via Redis!", "hits": hits}
     except Exception as e:
-        return JSONResponse({"status": "error", "detail": str(e)}, status_code=500)
+        return JSONResponse(
+            {"status": "error", "detail": str(e)},
+            status_code=500
+        )
+
 
 @app.get("/health")
 async def health():
-    global redis_client
     try:
         if redis_client and await redis_client.ping():
             return {"status": "ok"}
         return JSONResponse({"status": "degraded"}, status_code=200)
     except Exception as e:
-        return JSONResponse({"status": "error", "detail": str(e)}, status_code=500)
+        return JSONResponse(
+            {"status": "error", "detail": str(e)},
+            status_code=500
+        )
