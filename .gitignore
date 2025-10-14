@@ -57,3 +57,19 @@ logs/
 # Docker (local bind/volumes you might add)
 data/
 redis-data/
+# Windows misc
+desktop.ini
+
+# Jupyter (if ever used)
+.ipynb_checkpoints/
+
+# PEP 582 local packages (rare but harmless to ignore)
+__pypackages__/
+
+# Coverage extras
+.coverage.*
+coverage.xml
+
+# Stray PowerShell file that sometimes appears
+$null
+
