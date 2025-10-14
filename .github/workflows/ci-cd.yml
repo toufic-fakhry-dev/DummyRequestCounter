@@ -42,9 +42,13 @@ jobs:
 
       - name: Vulnerability scan (pip-audit)
         run: pip-audit || true          # make blocking by removing "|| true"
+      
+      - name: Make project importable
+        run: echo "PYTHONPATH=$PWD" >> $GITHUB_ENV
 
       - name: Run unit tests
         run: pytest -q --maxfail=1 --disable-warnings --cov=app --cov-report=term-missing
+
 
   docker_build_test:
     name: Build & Smoke Test Container
