@@ -61,7 +61,9 @@ jobs:
       - name: Install deps
         run: python -m pip install --upgrade pip && pip install -r requirements.txt
       - name: Run pytest
-        run: pytest -q --maxfail=1 --disable-warnings --cov=.
+        env:
+          PYTHONPATH: ${{ github.workspace }}
+        run: python -m pytest -q --maxfail=1 --disable-warnings --cov=.
       - name: Upload test reports (optional)
         if: success() || failure()
         uses: actions/upload-artifact@v4
