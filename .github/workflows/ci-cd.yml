@@ -69,7 +69,7 @@ jobs:
 
       - name: Run unit tests
         run: |
-          pytest tests/ -v
+         PYTHONPATH=.:$PYTHONPATH pytest tests/ -v
 
   # --- 3. Build & Push Docker Image ---
   build-and-push:
