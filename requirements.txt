@@ -4,3 +4,4 @@ redis==5.0.1
 pydantic
 pytest
 httpx
+pytest-asyncio
