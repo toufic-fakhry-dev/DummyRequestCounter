@@ -5,8 +5,8 @@ services:
     ports:
       - "8000:8000"
     depends_on:
-      - redis
-      - conditions: service_healthy
+      redis:
+        condition: service_healthy
     environment:
       - REDIS_HOST=redis
       - REDIS_PORT=6379
@@ -22,6 +22,12 @@ services:
       - redis_data:/data
     networks:
       - elsa_network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 1m30s
+      timeout: 30s
+      retries: 5
+      start_period: 30s
 
 volumes:
   redis_data:
