@@ -5,7 +5,7 @@ from fastapi.testclient import TestClient
 # Ajouter le dossier racine au PYTHONPATH
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from app import app  # import après avoir corrigé le chemin
+from app.app import app  # ✅ correction ici
 
 client = TestClient(app)
 
