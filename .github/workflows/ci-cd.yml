@@ -42,10 +42,14 @@ jobs:
         run: flake8 .
 
       - name: Run mypy (static typing)
-        run: mypy .
+        run: |
+          python -m pip install -r requirements.txt
+          mypy .
 
       - name: Run bandit (security scan)
-        run: bandit -r .
+        run: |
+          python -m pip install -r requirements.txt
+          bandit -r .
 
   # -----------------------
   # UNIT TESTS
