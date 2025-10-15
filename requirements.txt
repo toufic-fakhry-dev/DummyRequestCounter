@@ -3,3 +3,8 @@ uvicorn[standard]
 redis
 pydantic
 flask
+pytest
+httpx
+pytest-asyncio
+ruff
+bandit
