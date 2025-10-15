@@ -2,14 +2,14 @@ name: CI/CD Pipeline
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [ "main","feature/docker-setup" ]
   pull_request:
     branches: [ "main" ]
 
 env:
   PYTHON_VERSION: "3.12"
   DOCKER_IMAGE: joeb0/dummyrequestcounter
-  
+
 jobs:
   # -------------------------------
   # 1. Lint + Sécurité
