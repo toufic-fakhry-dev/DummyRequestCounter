@@ -7,7 +7,7 @@ import uvicorn
 app = FastAPI()
 
 # Read configuration from environment variables
-REDIS_HOST = os.getenv("REDIS_HOST", "redis")  # default to 'redis' service
+REDIS_HOST = os.getenv("REDIS_HOST", "redis")  
 REDIS_PORT = int(os.getenv("REDIS_PORT", 6379))
 redis = Redis(host=REDIS_HOST, port=REDIS_PORT, decode_responses=True)
 
