@@ -2,3 +2,7 @@ fastapi
 uvicorn[standard]
 redis
 pydantic
+pytest
+flake8
+bandit
+httpx
