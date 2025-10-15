@@ -7,6 +7,6 @@ def test_homepage_returns_200():
     """
     Vérifie que la route '/' renvoie bien un code 200 et contient le message attendu.
     """
-    response = client.get("/")
-    assert response.status_code == 200
-    assert "Hello!" in response.text
+    response = client.get("/")  # nosec B101
+    assert response.status_code == 200  # nosec B101
+    assert "Hello!" in response.text  # nosec B101
