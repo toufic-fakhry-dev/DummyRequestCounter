@@ -1,0 +1,42 @@
+services:
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: dummy-api
+    environment:
+      REDIS_HOST: ${REDIS_HOST:-redis}
+      REDIS_PORT: ${REDIS_PORT:-6379}
+      REDIS_DB: ${REDIS_DB:-0}
+    ports:
+      - "${API_PORT:-8000}:8000"
+    depends_on:
+      - redis
+    restart: unless-stopped
+    networks:
+      - app-net
+
+  redis:
+    image: redis:7-alpine
+    container_name: dummy-redis
+    command: ["redis-server", "--appendonly", "yes"]
+    ports:
+      - "${REDIS_PORT:-6379}:6379"
+    volumes:
+      - redis-data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    restart: unless-stopped
+    networks:
+      - app-net
+
+
+volumes:
+  redis-data: {}
+
+networks:
+  app-net:
+    driver: bridge
