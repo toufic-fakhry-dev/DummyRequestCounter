@@ -67,7 +67,9 @@ jobs:
           pip install pytest httpx fastapi uvicorn redis
 
       - name: Run tests
-        run: pytest -v
+        run: |
+        export PYTHONPATH=$(pwd) 
+        pytest -v
 
  
   build:
