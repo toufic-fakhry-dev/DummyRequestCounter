@@ -3,6 +3,7 @@ from app import app
 
 client = TestClient(app)
 
+
 def test_app_request_counting():
     _status_code = 200
     _content = "Hello! This page has been visited"
