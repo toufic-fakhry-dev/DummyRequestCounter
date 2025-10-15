@@ -1,0 +1,30 @@
+
+services:
+  web:
+    build: .
+    ports:
+      - "5050:5000"
+    environment:
+      - REDIS_HOST=redis
+      - REDIS_PORT=${REDIS_PORT}
+    depends_on:
+      - redis
+    networks:
+      - app_net  
+  redis:
+    image: "redis:7-alpine"
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - app_net
+
+# Define volumes
+volumes:
+  redis_data:
+
+# Define custom network
+networks:
+  app_net:
+    driver: bridge  # optional, explicitly sets driver
