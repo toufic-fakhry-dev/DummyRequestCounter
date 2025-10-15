@@ -1,0 +1,80 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: ["main", "master"]
+  pull_request:
+    branches: ["main", "master"]
+
+jobs:
+  # ---------- CI ----------
+  build-test:
+    runs-on: ubuntu-latest
+    services:
+      redis:
+        image: redis:7
+        ports:
+          - 6379:6379
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.10"
+
+      # ---- Install Dependencies ----
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      # ---- Code Quality ----
+      - name: Run linting (flake8)
+        run: |
+          pip install flake8
+          flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
+
+      - name: Run vulnerability scan (bandit)
+        run: |
+          pip install bandit
+          bandit -r app || true   # don’t fail the build on warnings
+
+      # ---- Tests ----
+      - name: Run tests
+        run: |
+          export PYTHONPATH=$PYTHONPATH:$(pwd)
+          pytest tests/ -v --disable-warnings
+
+      # ---- Build Docker image ----
+      - name: Build Docker image
+        run: docker build -t ${{ secrets.DOCKER_USERNAME }}/dummyrequestcounter:latest .
+
+      # ---- Test container ----
+      - name: Run container and verify health
+        run: |
+          docker run -d -p 8000:8000 --name test_container ${{ secrets.DOCKER_USERNAME }}/dummyrequestcounter:latest
+          sleep 5
+          curl -f http://localhost:8000 || (echo "Container not responding" && exit 1)
+          docker stop test_container
+
+  # ---------- CD ----------
+  push-to-dockerhub:
+    needs: build-test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Login to DockerHub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          push: true
+          tags: ${{ secrets.DOCKER_USERNAME }}/dummyrequestcounter:latest
