@@ -183,7 +183,7 @@ jobs:
 
       - name: Smoke test endpoint
         run: |
-          curl -v http://localhost:8000/ --fail
+          curl -v http://localhost:8000/health-check --fail
 
       - name: Stop and remove container
         if: always()
