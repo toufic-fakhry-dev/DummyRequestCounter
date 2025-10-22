@@ -20,7 +20,11 @@ def hello():
         return f"Hello! This page has been visited {hits} times."
     except Exception as e:
         return {"error": str(e)}
-    
+
+
+@app.get("/health-check")
+def health_check():
+    return "service is up and running"
 
 
 if __name__ == "__main__":
