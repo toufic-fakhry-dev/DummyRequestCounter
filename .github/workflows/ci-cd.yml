@@ -172,6 +172,7 @@ jobs:
       - name: Run container from built image
         run: |
           docker run -d --name ci_test_container -p 8000:8000 image-test:latest
+          
           # wait for container to be ready
           for i in {1..20}; do
             if curl -sS http://localhost:8000/ >/dev/null; then
