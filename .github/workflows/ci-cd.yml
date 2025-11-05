@@ -231,8 +231,8 @@ jobs:
         run: |
           echo "Full SHA: ${{ github.sha }}"
           echo "Short SHA: ${{ steps.build_meta.outputs.SHORT_SHA }}"
-          [ -z "${{ github.sha }}" ] && echo "EMPTY full SHA" && exit 1
-          [ -z "${{ steps.build_meta.outputs.SHORT_SHA }}" ] && echo "EMPTY short SHA" && exit 1
+          [ -z "${{ github.sha }}" ] && echo "EMPTY full SHA" && exit 1 || true
+          [ -z "${{ steps.build_meta.outputs.SHORT_SHA }}" ] && echo "EMPTY short SHA" && exit 1 || true
 
       - name: Build and push image (latest + sha + shortsha)
         uses: docker/build-push-action@v5
