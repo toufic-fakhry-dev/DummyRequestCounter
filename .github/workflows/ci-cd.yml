@@ -218,10 +218,23 @@ jobs:
           password: ${{ secrets.DOCKER_PASSWORD }}
 
       - name: Extract short SHA
-        id: vars
-        run: echo "SHORT_SHA=${GITHUB_SHA::7}" >> $GITHUB_OUTPUT
+        id: build_meta
+        shell: bash
+        run: |
+          if [ -z "${GITHUB_SHA}" ]; then
+            echo "GITHUB_SHA empty"; exit 1
+          fi
+          SHORT_SHA="${GITHUB_SHA:0:7}"
+          echo "SHORT_SHA=${SHORT_SHA}" >> "$GITHUB_OUTPUT"
 
-      - name: Build and push image (latest + sha)
+      - name: Debug tag components
+        run: |
+          echo "Full SHA: ${{ github.sha }}"
+          echo "Short SHA: ${{ steps.build_meta.outputs.SHORT_SHA }}"
+          [ -z "${{ github.sha }}" ] && echo "EMPTY full SHA" && exit 1
+          [ -z "${{ steps.build_meta.outputs.SHORT_SHA }}" ] && echo "EMPTY short SHA" && exit 1
+
+      - name: Build and push image (latest + sha + shortsha)
         uses: docker/build-push-action@v5
         with:
           context: .
@@ -230,4 +243,4 @@ jobs:
           tags: |
             ${{ secrets.DOCKER_USERNAME }}/${{ vars.IMAGE_NAME }}:latest
             ${{ secrets.DOCKER_USERNAME }}/${{ vars.IMAGE_NAME }}:${{ github.sha }}
-            ${{ secrets.DOCKER_USERNAME }}/${{ vars.IMAGE_NAME }}:${{ steps.vars.outputs.SHORT_SHA }}
+            ${{ secrets.DOCKER_USERNAME }}/${{ vars.IMAGE_NAME }}:${{ steps.build_meta.outputs.SHORT_SHA }}
