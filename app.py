@@ -22,8 +22,6 @@ def hello():
         return {"error": str(e)}
 
 
-
-
 @app.get("/health-check")
 def health_check():
     return "service is up and running"
