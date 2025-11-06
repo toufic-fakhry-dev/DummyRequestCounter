@@ -1,0 +1,37 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: counter-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: counter-app
+  template:
+    metadata:
+      labels:
+        app: counter-app
+    spec:
+      containers:
+        - name: counter-app
+          image: rodolphkhoury/dummyrequestcounter:latest
+          ports:
+            - containerPort: 5000
+          env:
+            - name: REDIS_HOST
+              value: "redis"
+            - name: REDIS_PORT
+              value: "6379"
+          volumeMounts:
+            - name: logs
+              mountPath: /var/log/app
+        - name: logger
+          image: busybox
+          command: ["/bin/sh", "-c"]
+          args: ["tail -F /var/log/app/app.log"]
+          volumeMounts:
+            - name: logs
+              mountPath: /var/log/app
+      volumes:
+        - name: logs
+          emptyDir: {}
