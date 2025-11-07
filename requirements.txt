@@ -1,0 +1,6 @@
+fastapi
+uvicorn[standard]
+redis
+pydantic
+Flask==3.0.3
+redis==5.0.7
