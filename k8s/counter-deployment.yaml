@@ -1,0 +1,67 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: counter-deployment-logging
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: counter-logging
+  template:
+    metadata:
+      labels:
+        app: counter-logging
+    spec:
+      volumes:
+        - name: shared-logs
+          emptyDir: {}
+      containers:
+        - name: counter-app
+          image: docker.io/library/python:3.9-slim
+          command: ["sh", "-c", "python -m http.server 8080 > /var/log/app/output.log 2>&1"]
+          ports:
+            - containerPort: 8080
+          volumeMounts:
+            - name: shared-logs
+              mountPath: /var/log/app
+        - name: sidecar-logger
+          image: busybox
+          command: ["sh", "-c", "tail -n+1 -f /var/log/app/output.log"]
+          volumeMounts:
+            - name: shared-logs
+              mountPath: /var/log/app
+
+
+
+
+
+
+
+
+
+
+
+
+
+# apiVersion: apps/v1
+# kind: Deployment
+# metadata:
+#   name: counter-deployment
+# spec:
+#   replicas: 1
+#   selector:
+#     matchLabels:
+#       app: counter
+#   template:
+#     metadata:
+#       labels:
+#         app: counter
+#     spec:
+#       containers:
+#         - name: counter-app
+#           image: docker.io/library/python:3.9-slim
+#           command: ["python", "-m", "http.server", "8080"]
+#           ports:
+#             - containerPort: 8080
+
+
