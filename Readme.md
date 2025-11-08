@@ -1,6 +1,6 @@
 # DummyRequestCounter Repository
 
-This repository contains multiple lab assignments for the Cloud & DevOps course.
+This repository contains multiple lab assignments.
 
 ## TP1 – Docker & Docker Compose
 > Flask microservice containerized with Docker Compose and CI/CD pipeline.
