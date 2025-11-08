@@ -5,19 +5,22 @@ It covers the essential Kubernetes concepts: Deployments, Services, Scaling, Sid
 The setup was tested locally using **Docker Desktop with Kubernetes enabled**.
 
 ## Repo Structure
+```
 TP3-Kubernetes/
-  app/:                      # Flask application folder
-    app.py                   # Python app (Flask + Redis)
-    Dockerfile               # Dockerfile for building the image
-
-  k8s/:                      # Kubernetes YAML manifests
-    counter-deployment.yaml              # Deployment for Flask app
-    counter-deployment-with-sidecar.yaml # Deployment with sidecar for logging
-    counter-service.yaml                 # NodePort service for Flask app
-    redis-deployment.yaml                # Redis backend deployment
-    redis-service.yaml                   # ClusterIP service for Redis
-
-  README.md                  # Main documentation file (this one)
+│
+├── app/
+│   ├── app.py              
+│   └── Dockerfile          
+│
+├── k8s/
+│   ├── counter-deployment.yaml                
+│   ├── counter-deployment-with-sidecar.yaml   
+│   ├── counter-service.yaml                   
+│   ├── redis-deployment.yaml                  
+│   └── redis-service.yaml                     
+│              
+└── readme1.md             
+```
 
 ## Step 1 – Enable Kubernetes in Docker Desktop
 
@@ -38,22 +41,26 @@ docker-desktop   Ready    control-plane,master   5m    v1.xx.x
 ## Step 2 – Build the Flask Application Image
 1. Navigate to the 'app/' folder
 2. Build the Docker image:
-   docker build -t requests-counter:1.0 .
-3. Verify the image:
+     ```bash
+     docker build -t requests-counter:1.0 .
+4. Verify the image:
    docker images
 
 We create a local Docker image for the Flask app. Since Docker Desktop’s Kubernetes shares the same Docker engine, it can use this local image directly without pushing to Docker Hub.
 
 ## Step 3 – Deploy Redis and the Flask App
 1. Apply the Redis deployment and service:
+   ```bash
    kubectl apply -f k8s/redis-deployment.yaml
    kubectl apply -f k8s/redis-service.yaml
 
-2. Apply the Flask app deployment and service:
+3. Apply the Flask app deployment and service:
+   ```bash
    kubectl apply -f k8s/counter-deployment.yaml
    kubectl apply -f k8s/counter-service.yaml
 
-3. Verify resources:
+5. Verify resources:
+   ```bash
    kubectl get deploy,po,svc
 
 Redis acts as the backend database storing the request count.
@@ -62,9 +69,10 @@ Both components are managed by Kubernetes Deployments for reliability.
 
 ## Step 4 – Access the Application
 1. Identify the NodePort service:
+   ```bash
    kubectl get svc counter-service
 
-2. Open the app in a browser:
+3. Open the app in a browser:
    http://localhost:30080/
 Output:
 {"message": "Hello from Flask + Redis!", "visits": 1}
@@ -74,9 +82,11 @@ Each refresh increments the counter stored in Redis.
 
 ## Step 5 – Scale the Application
 1. Increase the number of replicas:
+   ```bash
    kubectl scale deployment counter-deployment --replicas=3
 
-2. Verify:
+3. Verify:
+   ```bash
    kubectl get pods -o wide
    
 Kubernetes automatically creates 3 pods of the Flask app and balances incoming requests across them using the Service.
@@ -84,12 +94,15 @@ All pods use the same Redis backend, ensuring a consistent visits count across r
 
 ## Step 6 – Add Logging with a Sidecar Container
 1. Apply the updated deployment with the sidecar:
+   ```bash
    kubectl apply -f k8s/counter-deployment-with-sidecar.yaml
 
-2. Wait for rollout:
+3. Wait for rollout:
+   ```bash
    kubectl rollout status deploy/counter-deployment
 
-3. View logs from the sidecar:
+5. View logs from the sidecar:
+   ```bash
    kubectl logs deploy/counter-deployment -c log-shipper
 Output:
 Visit number: 1
@@ -101,21 +114,23 @@ This demonstrates the sidecar pattern, where secondary containers provide auxili
 
 ## Step 7 – Monitor and Troubleshoot
 Useful commands:
-- kubectl get pods
-- kubectl describe pod <pod-name>
-- kubectl logs <pod-name> -c counter
-- kubectl logs <pod-name> -c log-shipper
+    ```bash
+  -     kubectl get pods
+  -     kubectl describe pod <pod-name>
+  -     kubectl logs <pod-name> -c counter
+  -     kubectl logs <pod-name> -c log-shipper
 
 kubectl describe provides detailed pod information including container states, events, and errors.
 kubectl logs helps inspect output from either the app container or the sidecar container.
 
 ## Step 8 – Demonstrate Kubernetes Self-Healing
 1. Delete one running pod manually:
+   ```bash
    kubectl delete pod <pod-name>
 
-2. Watch Kubernetes recreate a new one:
+3. Watch Kubernetes recreate a new one:
+   ```bash
    kubectl get pods -w
    
 Kubernetes maintains the desired state defined in the Deployment.
 When a pod fails or is deleted, the controller immediately starts a replacement — showcasing Kubernetes self-healing capability.
-
