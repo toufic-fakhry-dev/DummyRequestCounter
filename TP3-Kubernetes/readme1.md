@@ -6,24 +6,23 @@ The setup was tested locally using **Docker Desktop with Kubernetes enabled**.
 
 ## Repo Structure
 TP3-Kubernetes/
-│
-├── app/ # Flask application
-│ ├── app.py # Python app (Flask + Redis)
-│ └── Dockerfile # Dockerfile for building the image
-│
-├── k8s/ # Kubernetes YAML manifests
-│ ├── counter-deployment.yaml
-│ ├── counter-deployment-with-sidecar.yaml
-│ ├── counter-service.yaml
-│ ├── redis-deployment.yaml
-│ └── redis-service.yaml
-│
-├── README.md # This file
+  app/:                      # Flask application folder
+    app.py                   # Python app (Flask + Redis)
+    Dockerfile               # Dockerfile for building the image
+
+  k8s/:                      # Kubernetes YAML manifests
+    counter-deployment.yaml              # Deployment for Flask app
+    counter-deployment-with-sidecar.yaml # Deployment with sidecar for logging
+    counter-service.yaml                 # NodePort service for Flask app
+    redis-deployment.yaml                # Redis backend deployment
+    redis-service.yaml                   # ClusterIP service for Redis
+
+  README.md                  # Main documentation file (this one)
 
 ## Step 1 – Enable Kubernetes in Docker Desktop
 
 1. Open **Docker Desktop → Settings → Kubernetes**  
-2. Check ✅ **Enable Kubernetes**, then click **Apply & restart**
+2. Check **Enable Kubernetes**, then click **Apply & restart**
 3. Verify the cluster is ready:
    ```bash
    kubectl get nodes
