@@ -1,0 +1,37 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: counter-deployment
+  labels:
+    app: counter
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: counter
+  template:
+    metadata:
+      labels:
+        app: counter
+    spec:
+      containers:
+        - name: counter
+          # If you already built your image locally with Docker Desktop, you can just put the local tag here.
+          # Example local tag: 'requests-counter:1.0'
+          # If you pushed to a registry, use 'dockerhub-username/requests-counter:1.0'
+          image: requests-counter:1.0
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 5000
+          env:
+            - name: REDIS_HOST
+              value: "redis"
+            - name: REDIS_PORT
+              value: "6379"
+          # Uncomment if your app needs this path to write logs for the sidecar example later
+          # volumeMounts:
+          #   - name: applogs
+          #     mountPath: /var/log/app
+      # volumes:
+      #   - name: applogs
+      #     emptyDir: {}
