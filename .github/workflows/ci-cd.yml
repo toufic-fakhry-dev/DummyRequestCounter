@@ -176,19 +176,29 @@ jobs:
     
     - name: Start full application stack
       run: |
-        docker-compose up -d
+        docker compose up -d
         sleep 25
+    
+    - name: Show running containers
+      run: |
+        docker compose ps
+        docker compose logs
     
     - name: Run E2E tests
       run: |
+        echo "Testing health endpoint..."
         curl -f http://localhost:8000/health || echo "Health check completed"
+        
+        echo "Resetting counter..."
         curl http://localhost:8000/reset || echo "Reset completed"
         
+        echo "Making 3 requests..."
         for i in {1..3}; do
           curl http://localhost:8000/ || echo "Request $i completed"
           sleep 1
         done
         
+        echo "Checking count..."
         COUNT=$(curl -s http://localhost:8000/count | jq -r '.count' || echo "0")
         echo "Final count: $COUNT"
         
@@ -197,8 +207,8 @@ jobs:
     - name: Cleanup
       if: always()
       run: |
-        docker-compose logs || true
-        docker-compose down -v || true
+        docker compose logs || true
+        docker compose down -v || true
 
   # ==================== BUILD JOBS ====================
   build:
