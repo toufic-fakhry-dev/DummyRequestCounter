@@ -14,50 +14,55 @@ REDIS_PASSWORD = os.getenv("REDIS_PASSWORD", None)
 # Redis connection
 try:
     redis = Redis(
-        host=REDIS_HOST, 
-        port=REDIS_PORT, 
+        host=REDIS_HOST,
+        port=REDIS_PORT,
         db=REDIS_DB,
         password=REDIS_PASSWORD,
-        decode_responses=True
+        decode_responses=True,
     )
 except Exception as e:
     print(f"Redis connection failed: {e}")
     redis = None
 
+
 @app.get("/")
 def hello():
     if redis:
         try:
-            redis.incr('hits')
-            hits = redis.get('hits')
+            redis.incr("hits")
+            hits = redis.get("hits")
             return {"message": f"Hello! This page has been visited {hits} times."}
         except Exception as e:
             return {"error": f"Redis error: {e}", "hits": 0}
     return {"error": "Redis not available", "hits": 0}
 
+
 @app.get("/health")
 def health_check():
     return {"status": "healthy"}
+
 
 @app.get("/count")
 def get_count():
     if redis:
         try:
-            hits = redis.get('hits') or 0
+            hits = redis.get("hits") or 0
             return {"count": int(hits)}
         except Exception as e:
             return {"error": f"Redis error: {e}", "count": 0}
     return {"error": "Redis not available", "count": 0}
 
+
 @app.get("/reset")
 def reset_count():
     if redis:
         try:
-            redis.delete('hits')
+            redis.delete("hits")
             return {"message": "Counter reset", "count": 0}
         except Exception as e:
             return {"error": f"Redis error: {e}"}
     return {"error": "Redis not available"}
+
 
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=8000)
