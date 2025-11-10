@@ -24,7 +24,7 @@ async def test_root_endpoint():
         response = await ac.get("/")
     assert response.status_code == 200
     data = response.json()
-    # Should have either message (if Redis works) or error (if Redis unavailable)
+    # Should have eithe message (if Redis works) or error (if Redis unavailable)
     assert "message" in data or "error" in data
 
     # If Redis is unavailable, should still return hits: 0
