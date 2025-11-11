@@ -1,0 +1,38 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: requests-counter
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: requests-counter
+  template:
+    metadata:
+      labels:
+        app: requests-counter
+    spec:
+      containers:
+      # Main Requests Counter container
+      - name: requests-counter
+        image: requests-counter:latest   # local image
+        imagePullPolicy: Never
+        ports:
+        - containerPort: 5000
+        env:
+        - name: REDIS_HOST
+          value: redis
+        volumeMounts:
+        - name: log-volume
+          mountPath: /app/logs
+      # Logging sidecar container
+      - name: log-sidecar
+        image: busybox
+        command: ["/bin/sh", "-c", "touch /app/logs/app.log && tail -f /app/logs/app.log"]
+        volumeMounts:
+        - name: log-volume
+          mountPath: /app/logs
+      # Shared volume between containers
+      volumes:
+      - name: log-volume
+        emptyDir: {}
