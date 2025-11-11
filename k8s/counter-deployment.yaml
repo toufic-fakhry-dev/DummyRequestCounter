@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: counter-deployment
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: counter
+  template:
+    metadata:
+      labels:
+        app: counter
+    spec:
+      volumes:
+        - name: applogs
+          emptyDir: {}
+      containers:
+        - name: counter
+          image: counter:1.0
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 5000
+          env:
+            - name: REDIS_HOST
+              value: "redis"
+            - name: REDIS_PORT
+              value: "6379"
+            - name: LOG_PATH
+              value: "/var/log/app/app.log"
+          volumeMounts:
+            - name: applogs
+              mountPath: /var/log/app
+        - name: logger
+          image: busybox:1.36
+          command: ["sh", "-c", "tail -n+1 -F /var/log/app/app.log"]
+          volumeMounts:
+            - name: applogs
+              mountPath: /var/log/app

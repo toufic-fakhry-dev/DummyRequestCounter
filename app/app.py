@@ -1,21 +1,31 @@
-from fastapi import FastAPI
-from redis import Redis
-import os
-import uvicorn
+import logging, os
+from flask import Flask, jsonify
+import redis
 
-app = FastAPI()
+# === LOGGING VERS FICHIER (pour le sidecar) ===
+LOG_PATH = os.getenv("LOG_PATH", "/var/log/app/app.log")
+os.makedirs(os.path.dirname(LOG_PATH), exist_ok=True)
+logging.basicConfig(
+    filename=LOG_PATH,
+    level=logging.INFO,
+    format="%(asctime)s %(levelname)s %(message)s"
+)
 
-# TODO: Configuration from environment variables
-REDIS_HOST = "localhost"
-REDIS_PORT = 6379
+app = Flask(__name__)
+redis_host = os.getenv("REDIS_HOST", "redis")
+redis_port = int(os.getenv("REDIS_PORT", "6379"))
+r = redis.Redis(host=redis_host, port=redis_port, db=0)
 
-redis = Redis(host=REDIS_HOST, port=REDIS_PORT)
+@app.route("/")
+def home():
+    logging.info("Hit /")
+    return "Requests Counter is running. Try /count"
 
-@app.get("/")
-def hello():
-    redis.incr('hits')
-    hits = redis.get('hits').decode('utf-8')
-    return f"Hello! This page has been visited {hits} times."
+@app.route("/count")
+def count():
+    value = r.incr("hits")
+    logging.info("Hit /count -> %s", value)
+    return jsonify({"hits": int(value)})
 
 if __name__ == "__main__":
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    app.run(host="0.0.0.0", port=5000)
